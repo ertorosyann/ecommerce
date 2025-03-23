@@ -1,11 +1,11 @@
-import { Request, Response } from "express"
 import { AddressSchema, UpdateUserSchema } from "../schema/users"
-import { prismaClient } from "../server"
-import { AuthenticatedRequest } from "../types/express"
-import { NotFoundExeption } from "../exeptions/not-found"
-import { ErrorCodes } from "../exeptions/root"
-import { Address } from "@prisma/client"
 import { BadRequestsExeption } from "../exeptions/bad-request"
+import { NotFoundExeption } from "../exeptions/not-found"
+import { AuthenticatedRequest } from "../types/express"
+import { ErrorCodes } from "../exeptions/root"
+import { Request, Response } from "express"
+import { Address } from "@prisma/client"
+import { prismaClient } from "../server"
 
 export const addAddress = async(req:AuthenticatedRequest, res: Response) => {
     AddressSchema.parse(req.body)

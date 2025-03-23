@@ -46,7 +46,7 @@ export const login = async (req:Request, res:Response, next:NextFunction) => {
         userId: user?.id
     }, JWT_SECRET, { expiresIn: '1h' })
 
-    res.status(200).json({user,token});
+    res.status(200).json({token});
 }
 
 export const me = async (req: AuthenticatedRequest, res: Response) => {
