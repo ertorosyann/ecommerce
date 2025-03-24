@@ -8,9 +8,7 @@ import { AuthenticatedRequest } from "../types/express";
 
 
 const adminMiddleware = async(req: AuthenticatedRequest, res: Response, next:NextFunction) => {
-    const user = req.user;
-    console.log(user?.role);
-    
+    const user = req.user;    
     if (user?.role == "ADMIN") {
         next()
     } else {

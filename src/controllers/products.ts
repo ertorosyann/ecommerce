@@ -13,8 +13,7 @@ export const createProduct = async(req: Request, res: Response) => {
             ...req.body,
             tags: req.body.tags.join(',')
         }
-    })
-    console.log(product);
+    })    
     
     res.json(product)
 }

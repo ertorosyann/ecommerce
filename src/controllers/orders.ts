@@ -9,14 +9,6 @@ import { ForbiddenExeption } from '../exeptions/forbidden'
 
 
 export const createOrder = async(req:AuthenticatedRequest, res:Response) => {
-    // 1. to create a transaction 
-    // 2. to list all  the cart items and processed if cart is not empty
-    // 3. calculate the total amount 
-    // 4. fetch address of user 
-    // 5. to define computed field for formatted address on address module
-    // 6. we will create a aorder and order productsorder products 
-    // 7. create event
-    // 8. to empty Cart
 
     return await prismaClient.$transaction(async (tx) => {
         const cartItem = await tx.cartItem.findMany({
@@ -124,27 +116,6 @@ export const cancelOrder = async(req:AuthenticatedRequest, res:Response) => {
         throw new NotFoundExeption('Order Not found !', ErrorCodes.ORDER_NOT_FOUND)
     }
 
-    // try {
-    //     const order = await prismaClient.order.update({
-    //         where: {
-    //             id: Number(req.params.id)
-    //         },
-    //         data: {
-    //             status: 'CANCELEED'
-    //         }
-    //     })
-
-    //     await prismaClient.orderEvent.create({
-    //         data: {
-    //             orderId: order.id,
-    //             status: 'CANCELEED',
-    //             address: order.address
-    //         }
-    //     })
-
-    //     return res.json(order);
-    // } catch (error) {
-    // }
 }
 
 export const getOrderById = async(req:Request, res:Response) => {
