@@ -28,8 +28,11 @@ A production-ready e-commerce backend with JWT authentication, product managemen
 
 📚 API Documentation
    🔐 Authentication
+   
       POST /auth/signup: Register a new user.
+      
       POST /auth/login: Log in and receive a JWT token.
+      
       GET /auth/me: Get the current user's profile.
    
    🛍️ Products
