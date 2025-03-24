@@ -34,5 +34,7 @@ export enum ErrorCodes {
 
     INTERNAL_SERVER_ERROR = 5001,
 
-    ORDER_NOT_FOUND = 6001
+    ORDER_NOT_FOUND = 6001,
+
+    FORBIDDEN = 7001
 }

@@ -5,11 +5,11 @@ import { json } from 'stream/consumers'
 import { BadRequestsExeption } from '../exeptions/bad-request'
 import { ErrorCodes } from '../exeptions/root'
 import { NotFoundExeption } from '../exeptions/not-found'
+import { ForbiddenExeption } from '../exeptions/forbidden'
 
 
 export const createOrder = async(req:AuthenticatedRequest, res:Response) => {
     // 1. to create a transaction 
-     
     // 2. to list all  the cart items and processed if cart is not empty
     // 3. calculate the total amount 
     // 4. fetch address of user 
@@ -78,31 +78,73 @@ export const listOrders = async(req:AuthenticatedRequest, res:Response) => {
     return res.json(orders);
 }
 
-export const cancelOrder = async(req:Request, res:Response) => {
-    // 1. wrap it inside transaction
-    // 2. check if the users is cancelling its own order
+export const cancelOrder = async(req:AuthenticatedRequest, res:Response) => {
+
     try {
-        const order = await prismaClient.order.update({
+
+        const order = await prismaClient.order.findUnique({
             where: {
                 id: Number(req.params.id)
-            },
-            data: {
-                status: 'CANCELEED'
             }
         })
 
-        await prismaClient.orderEvent.create({
-            data: {
-                orderId: order.id,
-                status: 'CANCELEED',
-                address: order.address
-            }
-        })
+        if (!order) {
+            throw new NotFoundExeption('Order Not Found',ErrorCodes.ORDER_NOT_FOUND)
+        }
 
-        return res.json(order);
+        if (order.userId !== req.user?.id) {
+            throw new ForbiddenExeption('You can only cancel your own order!', ErrorCodes.FORBIDDEN);
+        }
+
+
+        const updateOrder =  await prismaClient.$transaction(async (tx) => {
+            const order = await tx.order.update({
+                where: {
+                    id: Number(req.params.id)
+                },
+                data: {
+                    status: 'CANCELEED'
+                }
+            })
+    
+            await tx.orderEvent.create({
+                        data: {
+                            orderId: order.id,
+                            status: 'CANCELEED',
+                            address: order.address
+                        }
+            })
+
+            return order;
+        })        
+
+        return res.json(updateOrder);
+
     } catch (error) {
         throw new NotFoundExeption('Order Not found !', ErrorCodes.ORDER_NOT_FOUND)
     }
+
+    // try {
+    //     const order = await prismaClient.order.update({
+    //         where: {
+    //             id: Number(req.params.id)
+    //         },
+    //         data: {
+    //             status: 'CANCELEED'
+    //         }
+    //     })
+
+    //     await prismaClient.orderEvent.create({
+    //         data: {
+    //             orderId: order.id,
+    //             status: 'CANCELEED',
+    //             address: order.address
+    //         }
+    //     })
+
+    //     return res.json(order);
+    // } catch (error) {
+    // }
 }
 
 export const getOrderById = async(req:Request, res:Response) => {
@@ -121,4 +163,68 @@ export const getOrderById = async(req:Request, res:Response) => {
     } catch (error) {
         throw new NotFoundExeption('Order Not found !', ErrorCodes.ORDER_NOT_FOUND)
     }
+}
+
+export const listAllOrders = async(req: Request, res: Response) => {
+    let whereClause = {}
+    const status = req.query.status;
+    if (status) {
+        whereClause = {
+            status
+        }
+    }
+
+    const orders = await prismaClient.order.findMany({
+        where: whereClause,
+        skip: Number(req.query.skip) || 0,
+        take: 5
+    })
+    
+    return res.json(orders)
+
+}
+
+export const changeStatus = async(req: Request, res: Response) => {
+    return await prismaClient.$transaction(async (tx) => {
+        const order = await tx.order.update({
+            where:{
+                id: Number(req.params.id)
+            },
+            data:{
+                status: req.body.status
+            }
+        })
+
+        await tx.orderEvent.create({
+            data: {
+                orderId: order.id,
+                status: req.body.status,
+                address: order.address
+            }
+        })
+        res.json(order)
+    })
+}
+
+export const listUserOrders = async(req: Request, res: Response) => {
+    let whereClause : any = {
+        userId: Number(req.params.id)
+    }
+
+    const status = req.query.status;
+
+    if (status) {
+        whereClause = {
+            ...whereClause,
+            status
+        }
+    }
+
+    const orders = await prismaClient.order.findMany({
+        where: whereClause,
+        skip: Number(req.query.skip) || 0,
+        take: 5
+    })
+    
+    return res.json(orders)
 }

@@ -14,3 +14,16 @@ rootRouter.use('/carts', cartRoute)
 rootRouter.use('/orders', orderRoutes)
 
 export default rootRouter;
+
+//   1. user managment 
+//      a. list users
+//      c. get user by id
+//      b. change user role
+//  2.  order managment 
+//      a. list all orders (fillter on status)
+//      b. change order status
+//      c. list oll orders of given user
+//  3.  products
+//      a. search api for products (for both users and admins) => full text search
+
+//  .

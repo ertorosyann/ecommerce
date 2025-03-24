@@ -85,3 +85,24 @@ export const deleteProduct = async (req: Request, res: Response) => {
         throw new NotFoundExeption('User Not FOUND', ErrorCodes.USER_NOT_FOUND)
     }
 }
+
+export const searchProducts = async (req: Request, res: Response) => {
+    
+    const searchQuery = req.query.q?.toString();
+    const skip = Number(req.query.skip) || 0;
+    const take = Number(req.query.take) || 5;
+
+    const products = await prismaClient.product.findMany({
+        where: {
+            OR: [
+                { name: { search: searchQuery} },
+                { description: { search: searchQuery} },
+                { tags: { search: searchQuery} },
+            ]
+        },
+        skip,
+        take
+    })
+
+    return res.json(products) 
+}
