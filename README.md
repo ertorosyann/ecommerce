@@ -167,9 +167,7 @@ A production-ready e-commerce backend with JWT authentication, product managemen
 📦 Environment-Variables
 
    DATABASE_URL="mysql://user:password@localhost:3306/dbname"
-
    
    JWT_SECRET="your_jwt_secret_here"
 
-   
    PORT=3000
